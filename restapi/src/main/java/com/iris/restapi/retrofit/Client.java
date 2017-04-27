@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import java.io.IOException;
 import java.util.HashMap;
 
+import okhttp3.Authenticator;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
@@ -24,6 +25,7 @@ public class Client {
     private OkHttpClient.Builder builder = new OkHttpClient.Builder();
     private String baseURL = "";
     private HashMap<String, Object> header = new HashMap<>();
+    private Authenticator authenticator;
 
     public static void setDebugMode(boolean debug) {
         DEBUG = debug;
@@ -52,17 +54,37 @@ public class Client {
         return this;
     }
 
+    public Client addHeaderInterceptor(Interceptor interceptor) {
+        builder.addInterceptor(interceptor);
+        return this;
+    }
+
+    public Client addAuthenticator(Authenticator authenticator) {
+        this.authenticator = authenticator;
+        return this;
+    }
+
     public Retrofit build() {
+        //debug mode
         if(DEBUG) {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             builder.addInterceptor(loggingInterceptor);
         }
 
+        //not empty header
         if(!header.isEmpty()) {
-            builder.addInterceptor(chain -> chain.proceed(ClientHeader.createHeader(chain, header)));
+            builder.addInterceptor(new Interceptor() {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
+                    return chain.proceed(ClientHeader.createHeader(chain, header));
+                }
+            });
         }
 
+        if(authenticator != null) {
+            builder.authenticator(authenticator);
+        }
         return retrofit
                 .baseUrl(baseURL)
                 .addConverterFactory(GsonConverterFactory.create())

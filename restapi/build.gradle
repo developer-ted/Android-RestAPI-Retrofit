@@ -20,10 +20,10 @@ android {
         }
     }
 
-    compileOptions {
-        targetCompatibility JavaVersion.VERSION_1_8
-        sourceCompatibility JavaVersion.VERSION_1_8
-    }
+//    compileOptions {
+//        targetCompatibility 1.8
+//        sourceCompatibility 1.8
+//    }
 }
 
 dependencies {
@@ -31,5 +31,6 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
-    compile 'com.squareup.okhttp:okhttp:2.7.5'
+    compile 'com.squareup.okhttp3:okhttp:3.0.1'
+    compile 'com.google.code.gson:gson:2.3.1'
 }
